@@ -44,7 +44,7 @@ if (isset($_POST['signup'])) {
             $stmt->bind_param("sss", $username, $email, $hashed_password); 
 
             if ($stmt->execute()) {
-                $success = "Account created successfully! <a href='index.php'>Login here</a>";
+                $success = "Account created successfully! <a href='login.php'>Login here</a>";
             } else {
                 $error = "Error creating account!";
             }
