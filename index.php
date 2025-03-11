@@ -79,6 +79,10 @@ if (!isset($_SESSION['username'])) {
             color: #333;
         }
 
+        .small-input {
+            text-align: center;
+            border: 1px solid #ccc;
+        }
         /* Image Gallery */
         .tz-gallery {
             padding: 20px;
@@ -106,7 +110,7 @@ if (!isset($_SESSION['username'])) {
             border: 10px solid transparent;
             background: rgba(255, 255, 255, 0.8);
             margin: 10px;
-            margin-top: -30px;
+            margin-top: -50px;
             z-index: 10;
         }
 
@@ -122,6 +126,10 @@ if (!isset($_SESSION['username'])) {
             padding: 10px;
         }
 
+        .lazy-load {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
         @media (min-width: 768px) {
             .image-card {
                 width: calc(50% - 10px);
@@ -165,9 +173,11 @@ if (!isset($_SESSION['username'])) {
         <p class="text-center">Search images with hashtags.</p>
 
         <div class="input-group my-4">
-            <input type="text" id="searchQuery" class="form-control" placeholder="Enter hashtag (e.g., nature)">
-            <button class="btn btn-primary" id="searchBtn">Search</button>
-        </div>
+    <input type="text" id="searchQuery" class="form-control" placeholder="Enter hashtag (e.g., nature) and select number of images">
+    <input type="number" name="num" id="num" class="small-input" value="3" min="1" max="10">
+    <button class="btn btn-primary" id="searchBtn">Search</button>
+</div>
+
 
         <div class="tz-gallery">
             <div class="row" id="resultsContainer">
@@ -183,41 +193,50 @@ if (!isset($_SESSION['username'])) {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.imagesloaded/4.1.4/imagesloaded.pkgd.min.js"></script>
 
     <script>
-        $(document).ready(function () {
-            $("#searchBtn").click(function () {
-                var hashtag = $("#searchQuery").val().trim();
-                if (hashtag === "") {
-                    alert("Please enter a hashtag.");
-                    return;
-                }
+$(document).ready(function () {
+    $("#searchBtn").click(function () {
+        var hashtag = $("#searchQuery").val().trim();
+        var num = $("#num").val();
+        if (hashtag === "") {
+            alert("Please enter a hashtag.");
+            return;
+        }
 
-                $("#resultsContainer").html("<p class='text-center'>Loading...</p>");
+        $("#resultsContainer").html("<p class='text-center'>Loading...</p>");
 
-                $.ajax({
-                    url: "search.php",
-                    type: "GET",
-                    data: { hashtag: hashtag },
-                    success: function (response) {
-                        $("#resultsContainer").html(response);
+        $.ajax({
+            url: "search.php",
+            type: "GET",
+            data: { hashtag: hashtag , num_images: num},
+            success: function (response) {
+                $("#resultsContainer").html(response);
 
-                        // Ensure images load before Masonry initializes
-                        var grid = document.querySelector('#resultsContainer');
-                        imagesLoaded(grid, function () {
-                            new Masonry(grid, {
-                                itemSelector: '.image-card',
-                                columnWidth: '.image-card',
-                                percentPosition: true
-                            });
-                        });
-
-                        baguetteBox.run('.tz-gallery'); // Lightbox for full-screen view
-                    },
-                    error: function () {
-                        $("#resultsContainer").html("<p class='text-danger text-center'>Error fetching images.</p>");
-                    }
+                // Lazy load images with fade-in effect
+                $(".lazy-load").each(function () {
+                    $(this).on("load", function () {
+                        $(this).css("opacity", 1);
+                    });
                 });
-            });
+
+                // Ensure Masonry initializes after images load
+                var grid = document.querySelector('#resultsContainer');
+                imagesLoaded(grid, function () {
+                    new Masonry(grid, {
+                        itemSelector: '.image-card',
+                        columnWidth: '.image-card',
+                        percentPosition: true
+                    });
+                });
+
+                baguetteBox.run('.tz-gallery'); // Enable lightbox
+            },
+            error: function () {
+                $("#resultsContainer").html("<p class='text-danger text-center'>Error fetching images.</p>");
+            }
         });
+    });
+});
+
     </script>
 
 </body>

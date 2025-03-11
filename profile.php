@@ -66,6 +66,7 @@ $conn->close();
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -78,58 +79,84 @@ $conn->close();
     <style>
         body {
             background: linear-gradient(135deg, #667eea, #764ba2);
-            height: 100vh;
+            min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
+            padding: 20px;
         }
 
-        .profile-container {
+        /* Glassmorphic Navbar */
+        .navbar {
+            position: absolute;
+            top: 20px;
+            width: 90%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 10px 20px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar a {
+            color: white !important;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .navbar a:hover {
+            color: #f8f9fa !important;
+            transform: scale(1.05);
+        }
+
+        .container {
+            max-width: 900px;
             background: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 500px; /* Increased size */
         }
 
-        h2, h4 {
+        h2,
+        h4 {
             text-align: center;
             font-weight: bold;
             color: #333;
         }
 
-        .btn-primary, .btn-secondary {
+        .btn-primary,
+        .btn-secondary {
             width: 100%;
             border-radius: 6px;
             font-size: 16px;
         }
 
-        .history-list {
-            margin-top: 20px;
+        .profile-section {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .history-section {
+            max-height: 400px;
+            overflow-y: auto;
         }
 
         .history-item {
             background: #f8f9fa;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 5px;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
             font-size: 14px;
             display: flex;
             justify-content: space-between;
-        }
-
-        .logout-btn {
-            background-color: #dc3545;
-            color: white;
-        }
-        
-        .logout-btn:hover {
-            background-color: #c82333;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         }
 
         .form-group {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
 
         .success {
@@ -143,50 +170,94 @@ $conn->close();
             font-size: 14px;
             text-align: center;
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .row {
+                flex-direction: column;
+            }
+        }
     </style>
 </head>
+
 <body>
 
-    <div class="profile-container">
-        <h2>My Profile</h2>
-        <?php if ($success) echo "<p class='success'>$success</p>"; ?>
-        <?php if ($error) echo "<p class='error'>$error</p>"; ?>
-
-        <p><strong>Username:</strong> <?= htmlspecialchars($db_username); ?></p>
-        <p><strong>Email:</strong> <?= htmlspecialchars($email); ?></p>
-        
-        <h4 class="mt-4">Hashtag Search History</h4>
-        <div class="history-list">
-            <?php if ($history_result->num_rows > 0): ?>
-                <?php while ($row = $history_result->fetch_assoc()): ?>
-                    <div class="history-item">
-                        <span><?= htmlspecialchars($row['hashtag']); ?></span>
-                        <small><?= $row['search_date']; ?></small>
-                    </div>
-                <?php endwhile; ?>
-            <?php else: ?>
-                <p>No search history found.</p>
-            <?php endif; ?>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">Image Search</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="btn btn-primary" href="index.php">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" href="logout.php">Logout</a>
+                    </li>
+                </ul>
+            </div>
         </div>
+    </nav>
 
-        <!-- Change Password Section -->
-        <h4 class="mt-4">Change Password</h4>
-        <form method="post" action="">
-            <div class="form-group">
-                <input type="password" class="form-control" name="current_password" placeholder="Current Password" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="form-control" name="new_password" placeholder="New Password" required>
-            </div>
-            <div class="form-group">
-                <input type="password" class="form-control" name="confirm_new_password" placeholder="Confirm New Password" required>
-            </div>
-            <button type="submit" class="btn btn-primary" name="change_password">Update Password</button>
-        </form>
 
-        <a href="index.php" class="btn btn-primary mt-3">Go to Dashboard</a>
-        <a href="logout.php" class="btn logout-btn mt-2">Logout</a>
+    <div class="container">
+        <?php echo "<h2>Welcome, " . htmlspecialchars($db_username) . "!</h2>"; ?>
+        <?php if ($success)
+            echo "<p class='success'>$success</p>"; ?>
+        <?php if ($error)
+            echo "<p class='error'>$error</p>"; ?>
+
+        <div class="row">
+            <!-- Left Section: Profile & Password Change -->
+            <div class="col-md-6 profile-section">
+                <h4>Profile Details</h4>
+                <p><strong>Username:</strong> <?= htmlspecialchars($db_username); ?></p>
+                <p><strong>Email:</strong> <?= htmlspecialchars($email); ?></p>
+
+                <!-- Change Password -->
+                <h4 class="mt-4">Change Password</h4>
+                <form method="post" action="">
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="current_password"
+                            placeholder="Current Password" required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="new_password" placeholder="New Password"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <input type="password" class="form-control" name="confirm_new_password"
+                            placeholder="Confirm New Password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary" name="change_password">Update Password</button>
+                </form>
+
+            </div>
+
+            <!-- Right Section: Search History -->
+            <div class="col-md-6 history-section">
+                <h4>Search History</h4>
+                <div class="history-list">
+                    <?php if ($history_result->num_rows > 0): ?>
+                        <?php while ($row = $history_result->fetch_assoc()): ?>
+                            <div class="history-item">
+                                <span><?= htmlspecialchars($row['hashtag']); ?></span>
+                                <small><?= $row['search_date']; ?></small>
+                            </div>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <p>No search history found.</p>
+                    <?php endif; ?>
+                </div>
+
+            </div>
+        </div>
     </div>
 
 </body>
+
 </html>

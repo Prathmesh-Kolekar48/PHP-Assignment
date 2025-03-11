@@ -113,7 +113,7 @@ $conn->close();
                 <input type="password" class="form-control" name="password" placeholder="Password" required>
             </div>
             <button type="submit" class="btn btn-primary" name="login">Login</button>
-            
+            <a href="forgot_password.php" class="btn btn-link">Forgot Password</a></p>
         </form>
 
         <div class="text-center mt-3">
