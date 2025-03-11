@@ -29,7 +29,7 @@ def get_images_from_jina(target_url, num_images=5):
     jina_url = 'https://r.jina.ai/'
     headers = {
         "Accept": "application/json",
-        "Authorization": "Bearer jina_f63ea977fd2541d1b2b0d8cd6fb45b07-bPMfqoo9LcDrubaauf654m77sg5",
+        "Authorization": "",
         "Content-Type": "application/json",
         "X-Locale": "en-US",
         "X-With-Images-Summary": "true"
@@ -58,7 +58,7 @@ def get_flickr_images(hashtag, num_images=5):
     """
     Fetch images from Flickr API.
     """
-    FLICKR_API_KEY = "1eac120caf0d5106e1368f3682436eab"
+
     url = "https://api.flickr.com/services/rest/"
     params = {
         "method": "flickr.photos.search",
