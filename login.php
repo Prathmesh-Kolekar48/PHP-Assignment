@@ -1,21 +1,8 @@
 <?php
 session_start();
+include 'db_connect.php'; // Include database connection
 
 if (isset($_POST['login'])) {
-    // Database credentials
-    $db_host = 'localhost';
-    $db_user = 'root';
-    $db_pass = '12345678';
-    $db_name = 'user_data';
-
-    // Create connection
-    $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
-    
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
     // Retrieve and sanitize form data
     $username = trim($_POST['username']);
     $password = $_POST['password'];
@@ -33,10 +20,7 @@ if (isset($_POST['login'])) {
 
         // Verify password against the stored hash
         if (password_verify($password, $hashed_password)) {
-            // Store user session using only the username
             $_SESSION['username'] = $db_username;
-
-            // Redirect to dashboard
             header("Location: index.php");
             exit();
         } else {
@@ -45,58 +29,98 @@ if (isset($_POST['login'])) {
     } else {
         $error = "❌ Invalid username or password.";
     }
-    
+
     $stmt->close();
-    $conn->close();
 }
+
+$conn->close();
 ?>
+
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>User Login</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Image Gallery</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f2; }
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
         .login-container {
-            width: 300px;
-            padding: 20px;
-            background-color: #fff;
-            margin: 100px auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 350px;
         }
-        h2 { text-align: center; }
-        input[type=text], input[type=password] {
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .btn-primary {
             width: 100%;
             padding: 10px;
-            margin: 8px 0 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[type=submit] {
-            width: 100%;
-            padding: 10px;
-            background-color: #5cb85c;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: #667eea;
             border: none;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        input[type=submit]:hover {
-            background-color: #4cae4c;
+
+        .btn-primary:hover {
+            background-color: #764ba2;
         }
-        .error { color: red; margin-bottom: 10px; text-align: center; }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
+
     <div class="login-container">
-        <h2>User Login</h2>
+        <h2>Login</h2>
         <?php if(isset($error)) { echo "<p class='error'>$error</p>"; } ?>
+        
         <form method="post" action="">
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="submit" name="login" value="Login">
+            <div class="mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" name="login">Login</button>
+            
         </form>
+
+        <div class="text-center mt-3">
+            <p>Don't have an account? <a href="signup.php" class="btn btn-link">Sign Up</a></p>
+        </div>
+
     </div>
+
 </body>
 </html>

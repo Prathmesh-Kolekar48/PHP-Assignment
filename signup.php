@@ -1,113 +1,138 @@
 <?php
 session_start();
+include 'db_connect.php'; // Include database connection
 
-// Check if form is submitted
 if (isset($_POST['signup'])) {
-    // Database credentials
-    $db_host = 'localhost';
-    $db_user = 'root';
-    $db_pass = '12345678';
-    $db_name = 'user_data';
-
-    // Create connection
-    $conn = new mysqli($db_host, $db_user, $db_pass, $db_name);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Get form data
     $username = trim($_POST['username']);
     $password = $_POST['password'];
     $email = $_POST['email'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Check if passwords match
     if ($password !== $confirm_password) {
         $error = "Passwords do not match!";
     } else {
-        // Hash the password for security
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
-        // Check if username already exists
-        $stmt = $conn->prepare("SELECT username, password FROM user_details WHERE username = ?");
-        $stmt->bind_param("s", $username);  
+        // Check if username exists
+        $stmt = $conn->prepare("SELECT username FROM user_details WHERE username = ?");
+        $stmt->bind_param("s", $username);
         $stmt->execute();
         $stmt->store_result();
 
         if ($stmt->num_rows > 0) {
             $error = "Username already exists!";
         } else {
-            // Insert new user into database
             $stmt = $conn->prepare("INSERT INTO user_details (username, email, password, verified) VALUES (?, ?, ?, 0)");
-            $stmt->bind_param("sss", $username, $email, $hashed_password); 
-
+            $stmt->bind_param("sss", $username, $email, $hashed_password);
+            
             if ($stmt->execute()) {
                 $success = "Account created successfully! <a href='login.php'>Login here</a>";
             } else {
                 $error = "Error creating account!";
             }
         }
-
         $stmt->close();
     }
-
-    $conn->close();
 }
+
+$conn->close();
 ?>
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Signup</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup | Image Gallery</title>
+
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f2f2f2; }
-        .signup-container {
-            width: 300px;
-            padding: 20px;
-            background-color: #fff;
-            margin: 100px auto;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        body {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
-        h2 { text-align: center; }
-        input[type=text], input[type=password] {
+        
+        .container-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 350px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-control {
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .btn-primary {
             width: 100%;
             padding: 10px;
-            margin: 8px 0 16px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        input[type=submit] {
-            width: 100%;
-            padding: 10px;
-            background-color: #5cb85c;
+            border-radius: 6px;
+            font-size: 16px;
+            background-color: #667eea;
             border: none;
-            color: #fff;
-            border-radius: 4px;
-            cursor: pointer;
         }
-        input[type=submit]:hover {
-            background-color: #4cae4c;
+
+        .btn-primary:hover {
+            background-color: #764ba2;
         }
-        .error, .success { text-align: center; margin-bottom: 10px; }
-        .error { color: red; }
-        .success { color: green; }
+
+        .error {
+            color: red;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .success {
+            color: green;
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
-    <div class="signup-container">
+
+    <div class="container-box">
         <h2>Signup</h2>
         <?php if(isset($error)) { echo "<p class='error'>$error</p>"; } ?>
         <?php if(isset($success)) { echo "<p class='success'>$success</p>"; } ?>
+
         <form method="post" action="">
-        <input type="text" name="email" placeholder="Email" required>
-            <input type="text" name="username" placeholder="Username" required>
-            <input type="password" name="password" placeholder="Password" required>
-            <input type="password" name="confirm_password" placeholder="Confirm Password" required>
-            <input type="submit" name="signup" value="Signup">
+            <div class="mb-3">
+                <input type="text" class="form-control" name="email" placeholder="Email" required>
+            </div>
+            <div class="mb-3">
+                <input type="text" class="form-control" name="username" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" name="password" placeholder="Password" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required>
+            </div>
+            <button type="submit" class="btn btn-primary" name="signup">Signup</button>
         </form>
+
+        <div class="text-center mt-3">
+            <p>Already have an account? <a href="login.php" class="btn btn-link">Login</a></p>
+        </div>
     </div>
+
 </body>
 </html>

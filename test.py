@@ -1,16 +1,6 @@
-from duckduckgo_search import DDGS
+from googlesearch import search
 
-def get_pinterest_image_urls(hashtag, num_images=10):
-    with DDGS() as ddgs:
-        results = list(ddgs.images(f"site:flickr.com #{hashtag}", max_results=num_images))
-    
-    image_urls = [img["image"] for img in results]
-    return image_urls
+res = search("#nature images from instagram",stop=5)  # Search for 5 images with hashtag #nature from Instagram
 
-# Example usage
-hashtag = "selfie"
-image_urls = get_pinterest_image_urls(hashtag, num_images=5)
-
-# Print URLs
-for url in image_urls:
-    print(url)
+for r in res:
+    print(r)  # Print the URLs of the images
