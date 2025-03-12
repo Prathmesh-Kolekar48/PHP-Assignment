@@ -100,8 +100,8 @@ $conn->close();
         <?php if ($success) { echo "<p class='success'>$success</p>"; } ?>
 
         <form method="post">
-            <div class="mb-3"><input type="email" class="form-control" name="email" placeholder="Email" required></div>
-            <div class="mb-3"><input type="text" class="form-control" name="username" placeholder="Username" required></div>
+            <div class="mb-3"><input type="email" class="form-control" name="email" placeholder="Email" value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>" required></div>
+            <div class="mb-3"><input type="text" class="form-control" name="username" placeholder="Username" value="<?php echo isset($username) ? htmlspecialchars($username) : ''; ?>" required></div>
             <div class="mb-3"><input type="password" class="form-control" name="password" placeholder="Password" required></div>
             <div class="mb-3"><input type="password" class="form-control" name="confirm_password" placeholder="Confirm Password" required></div>
             <button type="submit" class="btn btn-primary" name="signup">Signup</button>
