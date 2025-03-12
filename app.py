@@ -1,8 +1,7 @@
 from flask import Flask, request, jsonify
 from duckduckgo_search import DDGS
-import os
+from apify_client import ApifyClient
 import requests
-from flask_cors import CORS
 
 app = Flask(__name__)
 
@@ -85,6 +84,25 @@ def get_flickr_images(hashtag, num_images=5):
     
     return []
 
+def get_instagram_images(hashtag, num_images=5):
+    """
+    Fetch images from Instagram using the Instagram API.
+    """
+    client = ApifyClient("apify_api_B4YUHSyHyqltIYvSaveik1gqftPCe41tl1qO")
+    run_input = {
+        "hashtags": [hashtag],
+        "resultsType": "posts",
+        "resultsLimit": num_images,
+    }
+
+    run = client.actor("reGe1ST3OBgYZSsZJ").call(run_input=run_input)
+
+    images = []
+    for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+        images.append(item.get("displayUrl", ""))
+    return images
+
+
 @app.route('/search_images', methods=['GET'])
 def search_images():
     """
@@ -116,6 +134,9 @@ def search_images():
 
     # Fetch from Flickr API
     image_data["flickr"] = get_flickr_images(hashtag, num_images)
+
+    # Fetch from Instagram API
+    image_data["instagram"] = get_instagram_images(hashtag, num_images)
     # print(image_data)
     return jsonify(image_data)
 

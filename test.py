@@ -1,6 +1,18 @@
-from googlesearch import search
+from apify_client import ApifyClient
 
-res = search("#nature images from instagram",stop=5)  # Search for 5 images with hashtag #nature from Instagram
+# Initialize the ApifyClient with your API token
+client = ApifyClient("apify_api_B4YUHSyHyqltIYvSaveik1gqftPCe41tl1qO")
 
-for r in res:
-    print(r)  # Print the URLs of the images
+# Prepare the Actor input
+run_input = {
+    "hashtags": ["nature"],
+    "resultsType": "posts",
+    "resultsLimit": 5,
+}
+
+# Run the Actor and wait for it to finish
+run = client.actor("reGe1ST3OBgYZSsZJ").call(run_input=run_input)
+
+# Fetch and print Actor results from the run's dataset (if there are any)
+for item in client.dataset(run["defaultDatasetId"]).iterate_items():
+    print(item.get("displayUrl", ""))

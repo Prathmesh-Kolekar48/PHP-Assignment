@@ -34,7 +34,7 @@ $stmt->close();
 $conn->close();
 
 // Flask API URL
-$flask_api_url = "https://image-search-backend.vercel.app/search_images?hashtag=" . urlencode($hashtag) . "&num_images=" . $num_images;
+$flask_api_url = "http://127.0.0.1:5000/search_images?hashtag=" . urlencode($hashtag) . "&num_images=" . $num_images;
 
 // Fetch images from Flask API
 $response = file_get_contents($flask_api_url);
@@ -55,12 +55,24 @@ foreach ($image_data as $source => $images) {
     if (!empty($images)) {
         echo "<div class='image-grid'>";
         foreach ($images as $img) {
-            echo "<div class='image-card'>
-                    <a href='$img' class='lightbox' data-caption='$source'>
-                        <img src='$img' alt='$hashtag image' class='lazy-load' loading='lazy'>
-                    </a>
-                    <div class='img-caption'>$source</div>
-                  </div>";
+            if ($source === 'instagram') {
+                $imageData = base64_encode(file_get_contents(filename: $img));
+                echo "<div class='image-card'>
+                        <a href='#' class='lightbox' data-caption='$source' data-image='data:image/jpg;base64,{$imageData}'>
+                            <img src='data:image/jpg;base64,{$imageData}' alt='$hashtag image' class='lazy-load' loading='lazy'/>
+                        </a>
+                        <div class='img-caption'>$source</div>
+                      </div>";
+
+            } else {
+                echo "<div class='image-card'>
+                <a href='$img' class='lightbox' data-caption='$source'>
+                    <img src='$img' alt='$hashtag image' class='lazy-load' loading='lazy'/>
+                </a>
+                <div class='img-caption'>$source</div>
+              </div>";
+                
+            }
         }
         echo "</div>";
     }
