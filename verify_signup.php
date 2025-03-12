@@ -1,14 +1,21 @@
 <?php
 session_start();
+include 'db_connect.php';
 
 $error = "";
+$success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $entered_code = $_POST['code'];
+    $email = $_SESSION['email'];
 
-    if ($entered_code == $_SESSION['reset_code']) {
-        header("Location: reset_password.php");
-        exit();
+    if ($entered_code == $_SESSION['verification_code']) {
+        $stmt = $conn->prepare("UPDATE user_details SET verified = 1 WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+
+        $success = "✅ Email Verified! <a href='login.php'>Login here</a>";
+        session_destroy();
     } else {
         $error = "❌ Invalid code. Try again!";
     }
@@ -20,7 +27,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Verify Code | Image Gallery</title>
+    <title>Verify Email | Image Gallery</title>
 
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -35,17 +42,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             align-items: center;
         }
 
-        .verify-container {
+        .container-box {
             background: white;
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
             width: 100%;
             max-width: 350px;
+            text-align: center;
         }
 
         h2 {
-            text-align: center;
             margin-bottom: 20px;
             font-weight: bold;
             color: #333;
@@ -54,6 +61,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         .form-control {
             border-radius: 6px;
             padding: 12px;
+            text-align: center;
+            font-size: 18px;
+            letter-spacing: 3px;
+            font-weight: bold;
         }
 
         .btn-primary {
@@ -69,29 +80,33 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             background-color: #764ba2;
         }
 
-        .error {
-            color: red;
+        .error, .success {
             font-size: 14px;
-            text-align: center;
-            margin-bottom: 15px;
+            margin-top: 10px;
         }
+
+        .error { color: red; }
+        .success { color: green; }
     </style>
 </head>
 <body>
 
-    <div class="verify-container">
-        <h2>Verify Code</h2>
-        <?php if ($error) { echo "<p class='error'>$error</p>"; } ?>
+    <div class="container-box">
+        <h2>Verify Your Email</h2>
+        <p>We've sent a 6-digit code to your email. Enter it below:</p>
 
-        <form action="verify_code.php" method="POST">
+        <?php if ($error) { echo "<p class='error'>$error</p>"; } ?>
+        <?php if ($success) { echo "<p class='success'>$success</p>"; } ?>
+
+        <form method="POST">
             <div class="mb-3">
-                <input type="text" class="form-control" name="code" placeholder="Enter the code" required>
+                <input type="text" class="form-control" name="code" required maxlength="6" pattern="\d{6}">
             </div>
             <button type="submit" class="btn btn-primary">Verify</button>
         </form>
 
         <div class="text-center mt-3">
-            <a href="forgot_password.php" class="btn btn-link">Didn't receive a code? Resend</a>
+            <p>Didn't receive the code? <a href="signup.php" class="btn btn-link">Resend</a></p>
         </div>
     </div>
 
