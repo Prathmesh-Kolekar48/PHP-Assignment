@@ -34,7 +34,7 @@ $stmt->close();
 $conn->close();
 
 // Flask API URL
-$flask_api_url = "http://127.0.0.1:5000/search_images?hashtag=" . urlencode($hashtag) . "&num_images=" . $num_images;
+$flask_api_url = "https://image-search-backend.vercel.app/search_images?hashtag=" . urlencode($hashtag) . "&num_images=" . $num_images;
 
 // Fetch images from Flask API
 $response = file_get_contents($flask_api_url);
