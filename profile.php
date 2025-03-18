@@ -27,21 +27,26 @@ $history_result = $history_stmt->get_result();
 
 // Handle password change
 if (isset($_POST['change_password'])) {
-    $current_password = $_POST['current_password'];
-    $new_password = $_POST['new_password'];
-    $confirm_new_password = $_POST['confirm_new_password'];
+    $current_password = htmlspecialchars(trim($_POST['current_password']));
+    $new_password = htmlspecialchars(trim($_POST['new_password']));
+    $confirm_new_password = htmlspecialchars(trim($_POST['confirm_new_password']));
 
-    // Fetch stored password hash
-    $stmt = $conn->prepare("SELECT password FROM user_details WHERE username = ?");
-    $stmt->bind_param("s", $username);
-    $stmt->execute();
-    $stmt->bind_result($stored_password);
-    $stmt->fetch();
-    $stmt->close();
+    // Validate inputs
+    if (empty($current_password) || empty($new_password) || empty($confirm_new_password)) {
+        $error = "All fields are required!";
+    } elseif ($new_password !== $confirm_new_password) {
+        $error = "New passwords do not match!";
+    } else {
+        // Fetch stored password hash
+        $stmt = $conn->prepare("SELECT password FROM user_details WHERE username = ?");
+        $stmt->bind_param("s", $username);
+        $stmt->execute();
+        $stmt->bind_result($stored_password);
+        $stmt->fetch();
+        $stmt->close();
 
-    // Verify current password
-    if (password_verify($current_password, $stored_password)) {
-        if ($new_password === $confirm_new_password) {
+        // Verify current password
+        if (password_verify($current_password, $stored_password)) {
             $hashed_password = password_hash($new_password, PASSWORD_DEFAULT);
 
             // Update password in database
@@ -54,10 +59,8 @@ if (isset($_POST['change_password'])) {
             }
             $update_stmt->close();
         } else {
-            $error = "New passwords do not match!";
+            $error = "Current password is incorrect!";
         }
-    } else {
-        $error = "Current password is incorrect!";
     }
 }
 
@@ -75,109 +78,9 @@ $conn->close();
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/form_&_bg.css">
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        /* Glassmorphic Navbar */
-        .navbar {
-            position: absolute;
-            top: 20px;
-            width: 90%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            backdrop-filter: blur(10px);
-            border-radius: 15px;
-            padding: 10px 20px;
-            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar a {
-            color: white !important;
-            font-weight: bold;
-            transition: 0.3s;
-        }
-
-        .navbar a:hover {
-            color: #f8f9fa !important;
-            transform: scale(1.05);
-        }
-
-        .container {
-            max-width: 900px;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        }
-
-        h2,
-        h4 {
-            text-align: center;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .btn-primary,
-        .btn-secondary {
-            width: 100%;
-            border-radius: 6px;
-            font-size: 16px;
-        }
-
-        .profile-section {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .history-section {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .history-item {
-            background: #f8f9fa;
-            padding: 12px;
-            border-radius: 8px;
-            margin-bottom: 8px;
-            font-size: 14px;
-            display: flex;
-            justify-content: space-between;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .form-group {
-            margin-bottom: 15px;
-        }
-
-        .success {
-            color: green;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        .error {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .row {
-                flex-direction: column;
-            }
-        }
-    </style>
 </head>
 
 <body>
@@ -246,7 +149,7 @@ $conn->close();
                         <?php while ($row = $history_result->fetch_assoc()): ?>
                             <div class="history-item">
                                 <span><?= htmlspecialchars($row['hashtag']); ?></span>
-                                <small><?= $row['search_date']; ?></small>
+                                <small><?= htmlspecialchars($row['search_date']); ?></small>
                             </div>
                         <?php endwhile; ?>
                     <?php else: ?>

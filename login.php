@@ -4,8 +4,8 @@ include 'db_connect.php'; // Include database connection
 
 if (isset($_POST['login'])) {
     // Retrieve and sanitize form data
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
+    $username = htmlspecialchars(trim($_POST['username']));
+    $password = htmlspecialchars(trim($_POST['password']));
 
     // Prepare a statement to prevent SQL injection
     $stmt = $conn->prepare("SELECT username, password FROM user_details WHERE username = ?");
@@ -47,57 +47,7 @@ $conn->close();
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-        
-        .login-container {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 350px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .form-control {
-            border-radius: 6px;
-            padding: 12px;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 16px;
-            background-color: #667eea;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #764ba2;
-        }
-
-        .error {
-            color: red;
-            font-size: 14px;
-            text-align: center;
-            margin-bottom: 15px;
-        }
-    </style>
+    <link rel="stylesheet" href="assets/css/form_&_bg.css">
 </head>
 <body>
 

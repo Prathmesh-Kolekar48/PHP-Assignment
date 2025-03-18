@@ -6,7 +6,8 @@ $error = "";
 $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $entered_code = $_POST['code'];
+    $entered_code = htmlspecialchars(trim($_POST['code']));
+
     $email = $_SESSION['email'];
 
     if ($entered_code == $_SESSION['verification_code']) {
@@ -32,66 +33,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <link rel="stylesheet" href="assets/css/form_&_bg.css">
 
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .container-box {
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            width: 100%;
-            max-width: 350px;
-            text-align: center;
-        }
-
-        h2 {
-            margin-bottom: 20px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .form-control {
-            border-radius: 6px;
-            padding: 12px;
-            text-align: center;
-            font-size: 18px;
-            letter-spacing: 3px;
-            font-weight: bold;
-        }
-
-        .btn-primary {
-            width: 100%;
-            padding: 10px;
-            border-radius: 6px;
-            font-size: 16px;
-            background-color: #667eea;
-            border: none;
-        }
-
-        .btn-primary:hover {
-            background-color: #764ba2;
-        }
-
-        .error, .success {
-            font-size: 14px;
-            margin-top: 10px;
-        }
-
-        .error { color: red; }
-        .success { color: green; }
-    </style>
 </head>
 <body>
 
-    <div class="container-box">
+    <div class="container">
         <h2>Verify Your Email</h2>
         <p>We've sent a 6-digit code to your email. Enter it below:</p>
 

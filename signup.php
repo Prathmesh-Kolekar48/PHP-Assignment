@@ -80,21 +80,12 @@ $conn->close();
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-    <style>
-        body { background: linear-gradient(135deg, #667eea, #764ba2); height: 100vh; display: flex; justify-content: center; align-items: center; }
-        .container-box { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); width: 100%; max-width: 350px; }
-        h2 { text-align: center; margin-bottom: 20px; font-weight: bold; color: #333; }
-        .form-control { border-radius: 6px; padding: 12px; }
-        .btn-primary { width: 100%; padding: 10px; border-radius: 6px; font-size: 16px; background-color: #667eea; border: none; }
-        .btn-primary:hover { background-color: #764ba2; }
-        .error, .success { font-size: 14px; text-align: center; margin-bottom: 15px; }
-        .error { color: red; }
-        .success { color: green; }
-    </style>
+    <link rel="stylesheet" href="assets/css/form_&_bg.css">
+
 </head>
 <body>
 
-    <div class="container-box">
+    <div class="login-container">
         <h2>Signup</h2>
         <?php if ($error) { echo "<p class='error'>$error</p>"; } ?>
         <?php if ($success) { echo "<p class='success'>$success</p>"; } ?>

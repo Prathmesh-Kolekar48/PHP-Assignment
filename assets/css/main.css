@@ -1,0 +1,121 @@
+
+/* Background Gradient */
+body {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Glassmorphic Navbar */
+.navbar {
+    position: absolute;
+    top: 20px;
+    width: 90%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 10px 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.navbar a {
+    color: white !important;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.navbar a:hover {
+    color: #f8f9fa !important;
+    transform: scale(1.05);
+}
+
+.gallery-container {
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0px 20px 30px rgba(0, 0, 0, 0.3);
+    width: 90% !important;
+    height: 80%;
+    max-width: none;
+    text-align: center;
+    transform: translateY(30px);
+    transition: all 0.3s ease-in-out;
+    overflow-y: auto;
+}
+
+h1 {
+    font-weight: bold;
+    color: #333;
+}
+
+.small-input {
+    text-align: center;
+    border: 1px solid #ccc;
+}
+
+/* Image Gallery */
+.tz-gallery {
+    padding: 20px;
+}
+
+.image-card {
+    width: 100%;
+    max-width: 300px;
+}
+
+.image-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border: 10px solid transparent;
+    transition: transform 0.3s ease-in-out;
+}
+
+.image-card .img-caption {
+    font-size: 14px;
+    display: none;
+    color: #333;
+    position: relative;
+    font-weight: bold;
+    border: 10px solid transparent;
+    background: rgba(255, 255, 255, 0.8);
+    margin: 10px;
+    margin-top: -50px;
+    z-index: 10;
+}
+
+.image-card:hover .img-caption {
+    display: block;
+}
+
+.image-grid {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+    padding: 10px;
+}
+
+.lazy-load {
+    opacity: 0;
+    transition: opacity 1s ease-in-out;
+}
+
+@media (min-width: 768px) {
+    .image-card {
+        width: calc(50% - 10px);
+    }
+}
+
+@media (min-width: 1024px) {
+    .image-card {
+        width: calc(33.33% - 10px);
+    }
+}

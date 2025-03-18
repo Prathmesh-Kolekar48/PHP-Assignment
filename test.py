@@ -1,18 +1,19 @@
-from apify_client import ApifyClient
+import requests
 
-# Initialize the ApifyClient with your API token
-client = ApifyClient("apify_api_B4YUHSyHyqltIYvSaveik1gqftPCe41tl1qO")
+def fetch_instagram_images(hashtag):
+    api_key = "AIzaSyDV_uJwrgNtawqtl6GDfeUj6NqO-H1tA4c"  # Replace with your API Key
+    cx = "b6207a641a6f84aa7"  # Replace with your Custom Search Engine ID
+    search_query = f"{hashtag}"  # Search Instagram for the hashtag
+    search_url = f"https://www.googleapis.com/customsearch/v1?q={search_query}&cx={cx}&searchType=image&key={api_key}"
 
-# Prepare the Actor input
-run_input = {
-    "hashtags": ["nature"],
-    "resultsType": "posts",
-    "resultsLimit": 5,
-}
+    response = requests.get(search_url)
+    results = response.json()
 
-# Run the Actor and wait for it to finish
-run = client.actor("reGe1ST3OBgYZSsZJ").call(run_input=run_input)
+    if "items" in results:
+        for item in results["items"]:
+            print(item["link"])  # Prints image URL
+    else:
+        print(f"No images found for #{hashtag}")
 
-# Fetch and print Actor results from the run's dataset (if there are any)
-for item in client.dataset(run["defaultDatasetId"]).iterate_items():
-    print(item.get("displayUrl", ""))
+# Example usage
+fetch_instagram_images("nature")
