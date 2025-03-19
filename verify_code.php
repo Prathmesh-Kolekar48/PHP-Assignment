@@ -5,12 +5,12 @@ require 'db_connect.php';
 $error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $entered_code = trim($_POST['code']);
+    $entered_code = htmlspecialchars(trim(trim($_POST['code'])));
     $email = $_SESSION['reset_email'] ?? '';
 
-    // Input validation: Check if entered code is a valid 6-digit number
-    if (!preg_match('/^\d{6}$/', $entered_code)) {
-        $error = "❌ Invalid code format. Please enter a 6-digit number.";
+    // Input validation: Check if entered code is a valid 6-character alphanumeric string
+    if (!preg_match('/^[a-zA-Z0-9]{6}$/', $entered_code)) {
+        $error = "❌ Invalid code format. Please enter a 6-character alphanumeric code.";
     } else {
         // Check if the email exists in session
         if (empty($email)) {
@@ -63,7 +63,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </form>
 
         <div class="text-center mt-3">
-            <a href="forgot_password.php" class="btn btn-link">Didn't receive a code? Resend</a>
+            <a href="handle_forgot_password.php" class="btn btn-link">Didn't receive a code? Resend</a>
         </div>
     </div>
 

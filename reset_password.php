@@ -8,7 +8,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = htmlspecialchars(trim($_POST["password"]));
     $confirm_password = htmlspecialchars(trim($_POST["confirm_password"]));
 
-
+    if ($password == '' or $confirm_password =='') {
+        $error = "❌ All fields are required!";
+        exit();
+    }
 
     // Validate password
     if (strlen($password) < 8) {
@@ -54,7 +57,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-    <div class="reset-container">
+    <div class="container">
         <h2>Reset Password</h2>
 
         <?php if ($error) { echo "<p class='error'>$error</p>"; } ?>

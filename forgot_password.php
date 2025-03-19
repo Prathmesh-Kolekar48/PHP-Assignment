@@ -1,5 +1,5 @@
 <?php
-session_start();
+
 require 'handle_forgot_pwd.php';
 ?>
 

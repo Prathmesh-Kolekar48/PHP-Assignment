@@ -18,6 +18,16 @@ if (!isset($_GET['hashtag'])) {
 $hashtag = htmlspecialchars($_GET['hashtag']);
 $num_images = intval($_GET['num_images']);
 
+if ($hashtag == "") {
+    echo "<p class='text-danger text-center'>Hashtag is required.</p>";
+    exit();
+}
+
+if ($num_images < 0 or $num_images > 10) {
+    echo "<p class='text-danger text-center'>Invalid number of images. enter number between 1 and 10</p>";
+    exit();
+}
+
 // Save search history
 $username = $_SESSION['username'];
 $search_date = date("Y-m-d H:i:s");
@@ -48,27 +58,29 @@ if (!$image_data || empty($image_data)) {
     exit();
 }
 
+
 // Display images
 foreach ($image_data as $source => $images) {
     if (!empty($images)) {
         echo "<div class='image-grid'>";
         foreach ($images as $img) {
-            if ($source === 'instagram' && strpos($img, 'data:image') === 0) {
-                // Instagram images (base64 encoded)
+            if ($source === 'instagram') {
+                $imageData = base64_encode(file_get_contents(filename: $img));
                 echo "<div class='image-card'>
-                        <a href='#' class='lightbox' data-caption='$source' data-image='$img'>
-                            <img src='$img' alt='$hashtag image' class='lazy-load' loading='lazy'/>
+                        <a href='#' class='lightbox' data-caption='$source' data-image='data:image/jpg;base64,{$imageData}'>
+                            <img src='data:image/jpg;base64,{$imageData}' alt='$hashtag image' class='lazy-load' loading='lazy'/>
                         </a>
                         <div class='img-caption'>$source</div>
                       </div>";
+
             } else {
-                // Other sources (direct URLs)
                 echo "<div class='image-card'>
-                        <a href='$img' class='lightbox' data-caption='$source'>
-                            <img src='$img' alt='$hashtag image' class='lazy-load' loading='lazy'/>
-                        </a>
-                        <div class='img-caption'>$source</div>
-                      </div>";
+                <a href='$img' class='lightbox' data-caption='$source'>
+                    <img src='$img' alt='$hashtag image' class='lazy-load' loading='lazy'/>
+                </a>
+                <div class='img-caption'>$source</div>
+              </div>";
+                
             }
         }
         echo "</div>";

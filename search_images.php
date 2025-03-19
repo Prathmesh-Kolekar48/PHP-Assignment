@@ -4,18 +4,25 @@ header("Content-Type: application/json");
 
 // Utility function to fetch images from DuckDuckGo
 function getImageUrls($source, $hashtag, $num_images = 5) {
-    $search_query = "site:$source $hashtag images";
-    $search_url = "https://duckduckgo.com/?q=" . urlencode($search_query) . "&t=h_&iax=images&ia=images";
+    $api_key = "AIzaSyDV_uJwrgNtawqtl6GDfeUj6NqO-H1tA4c"; // Replace with your API key
+    $cx = "b6207a641a6f84aa7"; // Replace with your CSE ID
 
-    $context = stream_context_create([
-        "http" => ["header" => "User-Agent: Mozilla/5.0"]
-    ]);
+    $search_query = "$hashtag site:$source"; // Form search query
+    $search_url = "https://www.googleapis.com/customsearch/v1?q=" . urlencode($search_query) .
+                  "&cx=$cx&searchType=image&num=$num_images&key=$api_key";
 
-    $html = file_get_contents($search_url, false, $context);
+    $response = file_get_contents($search_url);
+    $data = json_decode($response, true);
 
-    preg_match_all('/"image":"(.*?)"/', $html, $matches);
-    
-    return array_slice(array_unique($matches[1]), 0, $num_images);
+    $image_urls = [];
+
+    if (!empty($data['items'])) {
+        foreach ($data['items'] as $item) {
+            $image_urls[] = $item['link'];
+        }
+    }
+
+    return $image_urls;
 }
 
 // Utility function to fetch images from Jina AI
@@ -76,10 +83,11 @@ function getFlickrImages($hashtag, $num_images = 5) {
 }
 
 // Utility function to fetch images from Instagram using Apify
-function getInstagramImages($hashtag, $num_images = 5) {
-    $APIFY_TOKEN = "apify_api_B4YUHSyHyqltIYvSaveik1gqftPCe41tl1qO";
+function getInstagramImages($hashtag, $num_images = 3) {
+    $APIFY_TOKEN = "apify_api_B4YUHSyHyqltIYvSaveik1gqftPCe41tl1qO"; // Replace with your actual Apify API token
     $api_url = "https://api.apify.com/v2/acts/reGe1ST3OBgYZSsZJ/runs?token=$APIFY_TOKEN";
 
+    // Step 1: Start the Apify actor
     $post_data = json_encode([
         "hashtags" => [$hashtag],
         "resultsType" => "posts",
@@ -96,13 +104,39 @@ function getInstagramImages($hashtag, $num_images = 5) {
     curl_close($ch);
 
     $data = json_decode($response, true);
+    
+    if (!isset($data["data"]["id"])) {
+        die("Error: Failed to start Apify actor.");
+    }
 
+    $run_id = $data["data"]["id"];
+
+    // Step 2: Poll the API to check when the actor is finished
+    $status_url = "https://api.apify.com/v2/acts/reGe1ST3OBgYZSsZJ/runs/$run_id?token=$APIFY_TOKEN";
+
+    do {
+        sleep(3); // Wait 5 seconds before checking again
+        $status_response = file_get_contents($status_url);
+        $status_data = json_decode($status_response, true);
+        $status = $status_data["data"]["status"] ?? "FAILED";
+
+        if ($status === "FAILED" || $status === "ABORTED") {
+            die("Error: Apify actor execution failed.");
+        }
+    } while ($status !== "SUCCEEDED");
+
+    // Step 3: Fetch the results from the dataset
+    $dataset_url = $status_data["data"]["defaultDatasetId"];
+    $results_url = "https://api.apify.com/v2/datasets/$dataset_url/items?token=$APIFY_TOKEN";
+
+    $results_response = file_get_contents($results_url);
+    $results_data = json_decode($results_response, true);
+
+    // Step 4: Extract image URLs
     $images = [];
-    if (isset($data["data"])) {
-        foreach ($data["data"] as $post) {
-            if (!empty($post["displayUrl"])) {
-                $images[] = $post["displayUrl"];
-            }
+    foreach ($results_data as $post) {
+        if (!empty($post["displayUrl"])) {
+            $images[] = $post["displayUrl"];
         }
     }
 

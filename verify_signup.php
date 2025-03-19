@@ -10,6 +10,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $email = $_SESSION['email'];
 
+    if ($entered_code == "") {
+        $error = "❌ Code is required!";
+        exit();
+    }
+
     if ($entered_code == $_SESSION['verification_code']) {
         $stmt = $conn->prepare("UPDATE user_details SET verified = 1 WHERE email = ?");
         $stmt->bind_param("s", $email);
@@ -47,7 +52,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form method="POST">
             <div class="mb-3">
-                <input type="text" class="form-control" name="code" required maxlength="6" pattern="\d{6}">
+                <input type="text" class="form-control" name="code" required maxlength="6">
             </div>
             <button type="submit" class="btn btn-primary">Verify</button>
         </form>

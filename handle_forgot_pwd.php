@@ -21,15 +21,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     if ($result->num_rows > 0) {
         // Generate a 6-digit reset code
-        $code = rand(100000, 999999);
+        $code = bin2hex(random_bytes(3));
         $_SESSION['reset_email'] = $email;
+        // Set timezone to India (Asia/Kolkata)
+        date_default_timezone_set('Asia/Kolkata');
 
         // Set code expiry (e.g., valid for 15 minutes)
         $expiry_time = date('Y-m-d H:i:s', strtotime('+15 minutes'));
 
         // Insert reset code into database
         $stmt = $conn->prepare("INSERT INTO password_resets (email, reset_code, expiry_time) VALUES (?, ?, ?) 
-                                ON DUPLICATE KEY UPDATE reset_code = VALUES(reset_code), expiry_time = VALUES(expiry_time)");
+                    ON DUPLICATE KEY UPDATE reset_code = VALUES(reset_code), expiry_time = VALUES(expiry_time)");
         $stmt->bind_param("sss", $email, $code, $expiry_time);
         $stmt->execute();
 

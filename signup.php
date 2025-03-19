@@ -7,16 +7,24 @@ require 'mail_connect.php'; // Include mail connection
 $error = $success = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = trim($_POST['username']);
-    $email = trim($_POST['email']);
-    $password = $_POST['password'];
-    $confirm_password = $_POST['confirm_password'];
+    $username = htmlspecialchars(trim($_POST['username']));
+    $email = htmlspecialchars(trim($_POST['email']));
+    $password = (trim($_POST['password']));
+    $confirm_password = (trim($_POST['confirm_password']));
+
+
+    if ($username == "" || $email == "" || $password == "" || $confirm_password == "") {
+        $error = "❌ Please fill in all the fields!";
+        exit();
+    }
 
     // Password validation (at least 8 characters, one uppercase, one lowercase, one number, one special char)
     if (!preg_match('/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/', $password)) {
         $error = "❌ Password must be at least 8 characters long, include an uppercase letter, a lowercase letter, a number, and a special character!";
+        exit();
     } elseif ($password !== $confirm_password) {
         $error = "❌ Passwords do not match!";
+        exit();
     } else {
         $hashed_password = password_hash($password, PASSWORD_DEFAULT);
 
@@ -35,8 +43,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $error = "❌ Username already exists!";
         } else {
             // Generate a 6-digit verification code
-            $verification_code = rand(100000, 999999);
-            $_SESSION['verification_code'] = $verification_code;
+            $code = bin2hex(random_bytes(3));
+            $_SESSION['verification_code'] = $code;
             $_SESSION['email'] = $email;
 
             // Insert the new user as unverified (verified = 0)
@@ -47,10 +55,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 // Send Email via PHPMailer
                 try {
 
-                    $mail->setFrom('your-email@gmail.com', 'Image Gallery');
+                    $mail->setFrom('kolekarp04082003@gmail.com', 'Image Gallery');
                     $mail->addAddress($email);
                     $mail->Subject = "Verify Your Email";
-                    $mail->Body = "Your verification code is: $verification_code";
+                    $mail->Body = "Your verification code is: $code";
 
                     $mail->send();
                     header("Location: verify_signup.php");
