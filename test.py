@@ -1,7 +1,7 @@
 import requests
 
 def fetch_instagram_images(hashtag):
-    api_key = "AIzaSyDV_uJwrgNtawqtl6GDfeUj6NqO-H1tA4c"  # Replace with your API Key
+    api_key = ""  # Replace with your API Key
     cx = "b6207a641a6f84aa7"  # Replace with your Custom Search Engine ID
     search_query = f"{hashtag}"  # Search Instagram for the hashtag
     search_url = f"https://www.googleapis.com/customsearch/v1?q={search_query}&cx={cx}&searchType=image&key={api_key}"
